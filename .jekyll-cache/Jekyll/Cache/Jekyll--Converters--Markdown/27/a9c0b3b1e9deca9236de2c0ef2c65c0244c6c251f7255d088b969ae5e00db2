@@ -1,0 +1,87 @@
+I"B<h2 id="introduction">Introduction</h2>
+
+<p>In this blog post, we are going to make a splash screen animation using Rive (formerly known as Flare). One of the benefits of using Rive is that it reduces boilerplate code when creating animations. First, we are going to design our animation, then we are going to implement it to the default flutter project. We will cover this in two parts. One being design of the animation and the other is implementation.</p>
+
+<h2 id="part-1-design-and-animate">Part 1: Design and Animate</h2>
+
+<p>Go to rive.app, create your account. Then create a new flare project. This what it will look like:</p>
+
+<p><img class="alignnone wp-image-83307 size-full" src="https://gbot.dev/wp-content/uploads/2020/03/Default-Flare-1.png" alt="" width="1918" height="903" srcset="https://gbot.dev/wp-content/uploads/2020/03/Default-Flare-1.png 1918w, https://gbot.dev/wp-content/uploads/2020/03/Default-Flare-1-300x141.png 300w, https://gbot.dev/wp-content/uploads/2020/03/Default-Flare-1-1024x482.png 1024w, https://gbot.dev/wp-content/uploads/2020/03/Default-Flare-1-768x362.png 768w, https://gbot.dev/wp-content/uploads/2020/03/Default-Flare-1-1536x723.png 1536w" sizes="(max-width: 1918px) 100vw, 1918px" /></p>
+
+<p>After you drag and drop your assets, position your design as you desire. Then proceed to the animation tab. We can animate almost anything on the shape.</p>
+
+<p><img class="alignnone wp-image-83308 size-full" src="https://gbot.dev/wp-content/uploads/2020/03/design.png" alt="" width="1920" height="900" srcset="https://gbot.dev/wp-content/uploads/2020/03/design.png 1920w, https://gbot.dev/wp-content/uploads/2020/03/design-300x141.png 300w, https://gbot.dev/wp-content/uploads/2020/03/design-1024x480.png 1024w, https://gbot.dev/wp-content/uploads/2020/03/design-768x360.png 768w, https://gbot.dev/wp-content/uploads/2020/03/design-1536x720.png 1536w" sizes="(max-width: 1920px) 100vw, 1920px" /></p>
+
+<h3 id="some-useful-hotkeys-when-animating">Some useful hotkeys when animating:</h3>
+
+<ul>
+  <li><strong>T</strong> for translate, move shapes around.</li>
+  <li><strong>S</strong> for scaling the shapes.</li>
+  <li><strong>R</strong> for rotating the shapes.</li>
+  <li><strong>ctrl+z</strong> to undo</li>
+</ul>
+
+<p>When you are done with animating export your .flr file in binary format.</p>
+
+<p><img class="aligncenter wp-image-83317 size-full" src="https://gbot.dev/wp-content/uploads/2020/03/export-1.png" alt="" width="435" height="422" srcset="https://gbot.dev/wp-content/uploads/2020/03/export-1.png 435w, https://gbot.dev/wp-content/uploads/2020/03/export-1-300x291.png 300w" sizes="(max-width: 435px) 100vw, 435px" /></p>
+
+<h2 id="part-2-flutter-integration">Part 2: Flutter Integration</h2>
+
+<p>Rive provides a package that makes it really simple to use our animations into an iOS or Android app with Flutter. First, create a default Flutter project. You can do that following the steps below. We are using VS Code as IDE.</p>
+
+<p>To create a new Flutter project from the Flutter starter app template:</p>
+
+<ol>
+  <li>Open the Command Palette (<code class="highlighter-rouge">Ctrl</code>+<code class="highlighter-rouge">Shift</code>+<code class="highlighter-rouge">P</code> (<code class="highlighter-rouge">Cmd</code>+<code class="highlighter-rouge">Shift</code>+<code class="highlighter-rouge">P</code> on macOS)).</li>
+  <li>Select the <strong>Flutter: New Project</strong> command and press <code class="highlighter-rouge">Enter</code>.</li>
+  <li>Enter your desired <strong>Project name</strong>.</li>
+  <li>Select a <strong>Project location</strong>.</li>
+</ol>
+
+<p id="opening-a-project-from-existing-source-code">
+  Now your default project should be ready.
+</p>
+
+<p style="text-align: center;">
+  Add flare_splash_screen to the pubspec.yaml, under dependencies.
+</p>
+
+<p><img class="aligncenter wp-image-83311 size-full" src="https://gbot.dev/wp-content/uploads/2020/03/dependenies.png" alt="" width="313" height="113" srcset="https://gbot.dev/wp-content/uploads/2020/03/dependenies.png 313w, https://gbot.dev/wp-content/uploads/2020/03/dependenies-300x108.png 300w" sizes="(max-width: 313px) 100vw, 313px" /></p>
+
+<p style="text-align: center;">
+  Create an assets folder within your flutter project and add the .flr file you exported to assets.
+</p>
+
+<p><img class="aligncenter wp-image-83313 size-full" src="https://gbot.dev/wp-content/uploads/2020/03/assets.png" alt="" width="337" height="487" srcset="https://gbot.dev/wp-content/uploads/2020/03/assets.png 337w, https://gbot.dev/wp-content/uploads/2020/03/assets-208x300.png 208w" sizes="(max-width: 337px) 100vw, 337px" /></p>
+
+<p style="text-align: center;">
+  Now go and activate your .flr file in pubspec.yaml. Just type the path of the file under assets.
+</p>
+
+<p style="text-align: center;">
+  <img class="alignnone wp-image-83312 size-full" src="https://gbot.dev/wp-content/uploads/2020/03/assets-dependencies.png" alt="" width="746" height="137" srcset="https://gbot.dev/wp-content/uploads/2020/03/assets-dependencies.png 746w, https://gbot.dev/wp-content/uploads/2020/03/assets-dependencies-300x55.png 300w" sizes="(max-width: 746px) 100vw, 746px" />
+</p>
+
+<p>Saving something in pubspec.yaml file automatically runs “flutter pub get” in VSCode. If it does not <span style="font-weight: 400;">you can type </span><span style="font-weight: 400;">flutter pub get</span> <span style="font-weight: 400;">in the terminal.</span></p>
+
+<p>After adding dependencies and assets we need to import the package in the main.dart like so.</p>
+
+<p><img class="wp-image-83320 size-full aligncenter" src="https://gbot.dev/wp-content/uploads/2020/03/import.png" alt="" width="666" height="62" srcset="https://gbot.dev/wp-content/uploads/2020/03/import.png 666w, https://gbot.dev/wp-content/uploads/2020/03/import-300x28.png 300w" sizes="(max-width: 666px) 100vw, 666px" /></p>
+
+<p>Then we go to our main section.</p>
+
+<p><img class="wp-image-83321 size-full aligncenter" src="https://gbot.dev/wp-content/uploads/2020/03/main.png" alt="" width="747" height="486" srcset="https://gbot.dev/wp-content/uploads/2020/03/main.png 747w, https://gbot.dev/wp-content/uploads/2020/03/main-300x195.png 300w" sizes="(max-width: 747px) 100vw, 747px" /></p>
+
+<p>In “home” we give SplashScreen.navigate widget.</p>
+
+<ul>
+  <li>Name  -&gt; We type the destination of your .flr file.</li>
+  <li>Next    -&gt; Give the next widget to be displayed. In this case, we navigate to the homepage.</li>
+  <li>Until    -&gt; Duration of the animation on the screen.</li>
+  <li>startAnimation  -&gt; Name of the animation. It is “Untitled” by default. You can change this on rive.app.</li>
+  <li>backgroundColor -&gt; Background color of the splash screen.</li>
+  <li>fit -&gt; This makes the animation fit the whole screen.</li>
+</ul>
+
+<p>GitHub repo of the project: <a href="https://github.com/FercanSen/gbot-animation">https://github.com/FercanSen/gbot-animation</a></p>
+:ET

@@ -1,0 +1,51 @@
+I"�<p>CSS selectors all exist within the same global scope. Anyone who has worked with CSS long enough has had to come to terms with its aggressively global nature — a model clearly designed in the age of documents, now struggling to offer a sane working environment for today’s modern web applications. Every selector has the potential to have unintended side effects by targeting unwanted elements or clashing with other selectors. More surprisingly, our selectors may even lose out in the global specificity war, ultimately having little or no effect on the page at all.</p>
+
+<p>Any time we make a change to a CSS file, we need to carefully consider the global environment in which our styles will sit. No other front end technology requires so much discipline just to keep the code at a minimum level of maintainability. But it doesn’t have to be this way. It’s time to leave the era of global style sheets behind.</p>
+
+<p><em>It’s time for local CSS.</em></p>
+
+<blockquote>
+  <p>In other languages, it’s accepted that modifying <strong>the global environment</strong> is something to be done rarely, if ever.</p>
+</blockquote>
+
+<p>In the JavaScript community, thanks to tools like Browserify, Webpack and JSPM, it’s now expected that our code will consist of small modules, each encapsulating their explicit dependencies, exporting a minimal API.</p>
+
+<p>Yet, somehow, CSS still seems to be getting a free pass.</p>
+
+<p>Many of us — myself included, until recently — have been working with CSS so long that we don’t see the lack of local scope as a problem that we can solve without significant help from browser vendors. Even then, we’d still need to wait for the majority of our users to be using a browser with proper Shadow DOM support.</p>
+
+<p>We’ve worked around the issues of global scope with a series of naming conventions like <strong>OOCSS</strong>, <strong>SMACSS</strong>, <strong>BEM</strong> and <strong>SUIT</strong>, each providing a way for us to avoid naming collisions and emulate sane scoping rules.</p>
+
+<p>We no longer need to add lengthy prefixes to all of our selectors to simulate scoping. More components could define their own foo and bar identifiers which — unlike the traditional global selector model—wouldn’t produce any naming collisions.</p>
+
+<pre><strong>import</strong> styles <strong>from</strong> './MyComponent.css';
+<strong>import</strong> React, { Component } <strong>from</strong> 'react';
+<strong>export default class</strong> MyComponent <strong>extends</strong> Component {
+ <strong>render</strong>() {
+    return (
+      &lt;div&gt;
+        &lt;div className={<strong>styles.foo</strong>}&gt;<strong>Foo</strong>&lt;/div&gt;
+        &lt;div className={<strong>styles.bar</strong>}&gt;<strong>Bar</strong>&lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }</pre>
+
+<p>The benefits of global CSS — style re-use between components via utility classes, etc. — are still achievable with this model. The key difference is that, just like when we work in other technologies, we need to explicitly import the classes that we depend on. Our code can’t make many, if any, assumptions about the global environment.</p>
+
+<blockquote>
+  <p>Writing maintainable CSS is now encouraged, not by <strong>careful adherence to a naming convention</strong>, but by style encapsulation during development.</p>
+</blockquote>
+
+<p>Once you’ve tried working with local CSS, there’s really no going back. Experiencing true local scope in our style sheets — in a way that works across all browsers— is not something to be easily ignored.</p>
+
+<p>Introducing local scope has had a significant ripple effect on how we approach our CSS. Naming conventions, patterns of re-use, and the potential extraction of styles into separate packages are all directly affected by this shift, and we’re only at the beginning of this new era of local CSS.</p>
+
+<pre>process.env.NODE_ENV === 'development' ?<strong>
+    '[name]__[local]___[hash:base64:5]</strong>' :
+    '<strong>[hash:base64:5]'
+</strong>)</pre>
+
+<p>Understanding the ramifications of this shift is something that we’re still working through. With your valuable input and experimentation, I’m hoping that this is a conversation we can have together as a larger community.</p>
+
+<p><em>Note: Automatically optimising style re-use between components would be an amazing step forward, but it definitely requires help from people a lot smarter than me.</em></p>
+:ET

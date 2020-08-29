@@ -1,0 +1,5 @@
+# HTTrack Website Copier Cookie File
+# This file format is compatible with Netscape cookies
+gbot.dev	TRUE	/	FALSE	1999999999	uncode_privacy[consent_types]	%5B%5D
+gbot.dev	TRUE	/	FALSE	1999999999	wordpress_test_cookie	WP+Cookie+check
+

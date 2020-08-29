@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"
+	xmlns:content="http://purl.org/rss/1.0/modules/content/"
+	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:atom="http://www.w3.org/2005/Atom"
+	xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+	xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
+	>
+
+<channel>
+	<title>GBot Software Consultancy</title>
+	<atom:link href="https://gbot.dev/feed/" rel="self" type="application/rss+xml" />
+	<link>https://gbot.dev</link>
+	<description>Flutter and Firebase Experts</description>
+	<lastBuildDate>Tue, 24 Mar 2020 13:36:23 +0000</lastBuildDate>
+	<language>en-US</language>
+	<sy:updatePeriod>
+	hourly	</sy:updatePeriod>
+	<sy:updateFrequency>
+	1	</sy:updateFrequency>
+	<generator>https://wordpress.org/?v=5.3.4</generator>
+
+<image>
+	<url>https://gbot.dev/wp-content/uploads/2020/01/cropped-icon-1-32x32.png</url>
+	<title>GBot Software Consultancy</title>
+	<link>https://gbot.dev</link>
+	<width>32</width>
+	<height>32</height>
+</image> 
+	<item>
+		<title>Building a Flutter Quiz App using Firebase &#038; Hasura GraphQL Engine &#8211; Part 1</title>
+		<link>https://gbot.dev/2020/03/24/building-a-flutter-quiz-app-using-firebase-hasura-graphql-engine-part-1/</link>
+				<pubDate>Tue, 24 Mar 2020 12:51:44 +0000</pubDate>
+		<dc:creator><![CDATA[Can Taşpınar]]></dc:creator>
+				<category><![CDATA[Uncategorized]]></category>
+
+		<guid isPermaLink="false">https://gbot.dev/?p=83171</guid>
+				<description><![CDATA[This tutorial was initially published on Hasura blog Introduction In this blog post we are going to make a quiz [&#8230;]]]></description>
+								<content:encoded><![CDATA[<p><em>This tutorial was initially published on <a href="https://hasura.io/blog/build-flutter-app-graphql-hasura-serverless-part1/">Hasura blog</a></em></p>
+<h2 id="introduction">Introduction</h2>
+<p>In this blog post we are going to make a quiz app with Flutter powered by Hasura and Firebase. We are going to see how Hasura can work with Firebase services such as Authentication and Cloud Functions to handle user authentication and business logic. Combining these services together will provide us a flexible and scalable architecture.</p>
+<p>This will be a 3-part series. In this first part, we are going to deploy Hasura and we will see how to model the relational data with permissions. <strong>Part 2 </strong>will cover how to setup Auth with Firebase and Hasura. <strong>Part 3</strong> will cover how to make the flutter frontend.</p>
+<h2 id="hasura-deployment-on-heroku">Hasura Deployment on Heroku</h2>
+<p>Deploy Hasura less than a minute by using the Heroku button below.</p>
+<p><a href="https://heroku.com/deploy?template=https://github.com/hasura/graphql-engine-heroku" target="_blank" rel="noopener noreferrer"><img src="https://www.herokucdn.com/deploy/button.svg" alt="Hasura on Heroku" /></a></p>
+<p>When it is done, you can access the Hasura Console by opening your Heroku app URL.</p>
+<h2 id="modelling-data"><img class="alignnone size-full wp-image-83175" src="https://gbot.dev/wp-content/uploads/2020/03/1.png" alt="" width="1600" height="934" srcset="https://gbot.dev/wp-content/uploads/2020/03/1.png 1600w, https://gbot.dev/wp-content/uploads/2020/03/1-300x175.png 300w, https://gbot.dev/wp-content/uploads/2020/03/1-1024x598.png 1024w, https://gbot.dev/wp-content/uploads/2020/03/1-768x448.png 768w, https://gbot.dev/wp-content/uploads/2020/03/1-1536x897.png 1536w" sizes="(max-width: 1600px) 100vw, 1600px" /></h2>
+<h2>Modelling Data</h2>
+<p>Let’s start with modelling our data first. We are going to define columns, relationships and permissions. Hasura makes it easy to create relationships by tracking foreign keys in tables and suggesting possible relationships. By setting permissions you can restrict access for rows and columns for users by their role.</p>
+<p>Head to the <strong>Data &gt; Add Table</strong></p>
+<p><strong>HINT:</strong> You can use the “Frequently used columns” for these frequently used types:</p>
+<h3><img class="alignnone wp-image-83176 size-full" src="https://gbot.dev/wp-content/uploads/2020/03/2.png" alt="" width="571" height="412" srcset="https://gbot.dev/wp-content/uploads/2020/03/2.png 571w, https://gbot.dev/wp-content/uploads/2020/03/2-300x216.png 300w" sizes="(max-width: 571px) 100vw, 571px" /></h3>
+<h3></h3>
+<h3>Table: users</h3>
+<p><code>id</code>, <code>email</code>, <code>name</code><strong> </strong>columns will be filled by the data coming from Firebase. Notice that <code>id</code> here is type of <code>Text</code><strong>.</strong> We are going to talk more about that later on. <code>score</code><strong> </strong>column will be incremented if the user submits the correct answer. <code>created_at</code> will be set to now when a new user is inserted to the table. Let’s set <code>id</code><strong> </strong>as the<strong> </strong>primary key.</p>
+<p><img class="alignnone size-full wp-image-83177" src="https://gbot.dev/wp-content/uploads/2020/03/3.png" alt="" width="1343" height="894" srcset="https://gbot.dev/wp-content/uploads/2020/03/3.png 1343w, https://gbot.dev/wp-content/uploads/2020/03/3-300x200.png 300w, https://gbot.dev/wp-content/uploads/2020/03/3-1024x682.png 1024w, https://gbot.dev/wp-content/uploads/2020/03/3-768x511.png 768w" sizes="(max-width: 1343px) 100vw, 1343px" /></p>
+<p>After creating table head to the <strong>Permissions </strong>tab. For now, there is only one role which is admin and it has full access on every operation below. Enter a new role called “user”. For users table we are only going to give select permissions. A user should be able to see other’s name and score. We are mostly going to deal with following rules when we are adjusting select permissions.</p>
+<ul>
+<li><strong>Row select permissions</strong> to restrict access to rows.</li>
+<li><strong>Column select permissions</strong> to restrict access for certain columns</li>
+</ul>
+<p>We don’t need a custom check for <strong>Row select permissions. </strong>For the <strong>Column select permissions, </strong>check only name and score columns. This way we ensure that users can only see these fields.</p>
+<p><img class="alignnone size-full wp-image-83178" src="https://gbot.dev/wp-content/uploads/2020/03/4.png" alt="" width="1387" height="916" srcset="https://gbot.dev/wp-content/uploads/2020/03/4.png 1387w, https://gbot.dev/wp-content/uploads/2020/03/4-300x198.png 300w, https://gbot.dev/wp-content/uploads/2020/03/4-1024x676.png 1024w, https://gbot.dev/wp-content/uploads/2020/03/4-768x507.png 768w" sizes="(max-width: 1387px) 100vw, 1387px" /></p>
+<p><strong>Table: questions</strong></p>
+<p><code>id</code><strong> </strong>is a field with type UUID and the primary key. Default function <code>gen_random_uuid()</code><strong> </strong>will generate a unique UUID whenever a new object is inserted to the table. <strong>question </strong>is the question title and <code>created_at</code> will be used for ordering questions later.</p>
+<p><img class="alignnone size-full wp-image-83179" src="https://gbot.dev/wp-content/uploads/2020/03/5.png" alt="" width="1600" height="799" srcset="https://gbot.dev/wp-content/uploads/2020/03/5.png 1600w, https://gbot.dev/wp-content/uploads/2020/03/5-300x150.png 300w, https://gbot.dev/wp-content/uploads/2020/03/5-1024x511.png 1024w, https://gbot.dev/wp-content/uploads/2020/03/5-768x384.png 768w, https://gbot.dev/wp-content/uploads/2020/03/5-1536x767.png 1536w" sizes="(max-width: 1600px) 100vw, 1600px" /></p>
+<p>For permissions, every user can make a query to get the questions, so we have the following permission for the questions table.</p>
+<p><img class="alignnone size-full wp-image-83180" src="https://gbot.dev/wp-content/uploads/2020/03/6.png" alt="" width="1385" height="905" srcset="https://gbot.dev/wp-content/uploads/2020/03/6.png 1385w, https://gbot.dev/wp-content/uploads/2020/03/6-300x196.png 300w, https://gbot.dev/wp-content/uploads/2020/03/6-1024x669.png 1024w, https://gbot.dev/wp-content/uploads/2020/03/6-768x502.png 768w" sizes="(max-width: 1385px) 100vw, 1385px" /></p>
+<p><strong>Table: question_answers</strong></p>
+<p><code>id</code><strong> </strong>is again type of UUID and the primary key for the table. <code>answer</code> is the question answer. Since we are going to give multiple answer options for a question, we need to know which answer is the correct one. To do that we have the <code>is_correct</code> column with a type of Boolean.</p>
+<p><img class="alignnone size-full wp-image-83181" src="https://gbot.dev/wp-content/uploads/2020/03/7.png" alt="" width="1385" height="761" srcset="https://gbot.dev/wp-content/uploads/2020/03/7.png 1385w, https://gbot.dev/wp-content/uploads/2020/03/7-300x165.png 300w, https://gbot.dev/wp-content/uploads/2020/03/7-1024x563.png 1024w, https://gbot.dev/wp-content/uploads/2020/03/7-768x422.png 768w" sizes="(max-width: 1385px) 100vw, 1385px" /></p>
+<p><code>question_id</code><strong> </strong>is here to point out which question this answer belongs to. So, it will be a foreign key.</p>
+<p><img class="alignnone wp-image-83182" src="https://gbot.dev/wp-content/uploads/2020/03/8.png" alt="" width="654" height="561" srcset="https://gbot.dev/wp-content/uploads/2020/03/8.png 844w, https://gbot.dev/wp-content/uploads/2020/03/8-300x257.png 300w, https://gbot.dev/wp-content/uploads/2020/03/8-768x659.png 768w" sizes="(max-width: 654px) 100vw, 654px" /></p>
+<p>Users should be able to make a query to get the possible answers of a question. Permissions for this table is as below.</p>
+<p><img class="alignnone size-full wp-image-83183" src="https://gbot.dev/wp-content/uploads/2020/03/9.png" alt="" width="1384" height="931" srcset="https://gbot.dev/wp-content/uploads/2020/03/9.png 1384w, https://gbot.dev/wp-content/uploads/2020/03/9-300x202.png 300w, https://gbot.dev/wp-content/uploads/2020/03/9-1024x689.png 1024w, https://gbot.dev/wp-content/uploads/2020/03/9-768x517.png 768w" sizes="(max-width: 1384px) 100vw, 1384px" /></p>
+<p><strong>Table: user_answers</strong></p>
+<p><code>id</code><strong> </strong>is type of UUID and primary key. <code>user_id</code>, <code>question_id</code> and <code>answer_id</code><strong> </strong>are foreign keys to point out to other tables. Notice that <code>user_id</code><strong> </strong>column is type of Text instead of UUID. This is because we defined the <code>id</code> field in <code>users</code> table as Text. This is because it will be filled by the value coming from Firebase Authentication and Firebase user id is a string.</p>
+<figure class="kg-card kg-image-card"><img class="alignnone size-full wp-image-83184" src="https://gbot.dev/wp-content/uploads/2020/03/10.png" alt="" width="1387" height="764" srcset="https://gbot.dev/wp-content/uploads/2020/03/10.png 1387w, https://gbot.dev/wp-content/uploads/2020/03/10-300x165.png 300w, https://gbot.dev/wp-content/uploads/2020/03/10-1024x564.png 1024w, https://gbot.dev/wp-content/uploads/2020/03/10-768x423.png 768w" sizes="(max-width: 1387px) 100vw, 1387px" /><img class="alignnone size-full wp-image-83185" src="https://gbot.dev/wp-content/uploads/2020/03/11.png" alt="" width="950" height="420" srcset="https://gbot.dev/wp-content/uploads/2020/03/11.png 950w, https://gbot.dev/wp-content/uploads/2020/03/11-300x133.png 300w, https://gbot.dev/wp-content/uploads/2020/03/11-768x340.png 768w" sizes="(max-width: 950px) 100vw, 950px" /></figure>
+<p>For the permission part, we are going to allow users to insert answers, but we need to make sure a user can only insert an answer if the request is coming from the same user. In other words, a user can’t insert a new record on behalf of someone else. This is where <strong>Sessions Variables</strong> comes in. Hit with<strong> custom check </strong>box and give the following rule.</p>
+<figure><img class="alignnone size-full wp-image-83186" src="https://gbot.dev/wp-content/uploads/2020/03/12.png" alt="" width="954" height="452" srcset="https://gbot.dev/wp-content/uploads/2020/03/12.png 954w, https://gbot.dev/wp-content/uploads/2020/03/12-300x142.png 300w, https://gbot.dev/wp-content/uploads/2020/03/12-768x364.png 768w" sizes="(max-width: 954px) 100vw, 954px" /></figure>
+<figure class="kg-card kg-image-card">Every request from user that comes to the GraphQL API, will include a <code>X-Hasura-User-Id</code> header. We are going to talk more on that in Authentication part. Last thing we need to do is to set to the <code>user_id</code> field automatically from the <code>X-Hasura-User-Id</code> header. For that we are going to make use of <strong>Column presets. </strong>This allow a column to be filled by a static value or a session variable in our case.</figure>
+<p><img class="alignnone size-full wp-image-83187" src="https://gbot.dev/wp-content/uploads/2020/03/13.png" alt="" width="1255" height="168" srcset="https://gbot.dev/wp-content/uploads/2020/03/13.png 1255w, https://gbot.dev/wp-content/uploads/2020/03/13-300x40.png 300w, https://gbot.dev/wp-content/uploads/2020/03/13-1024x137.png 1024w, https://gbot.dev/wp-content/uploads/2020/03/13-768x103.png 768w" sizes="(max-width: 1255px) 100vw, 1255px" /></p>
+<p>At the end insert permissions for user_answers table should look like below.</p>
+<p><img class="alignnone size-full wp-image-83188" src="https://gbot.dev/wp-content/uploads/2020/03/14.png" alt="" width="1384" height="966" srcset="https://gbot.dev/wp-content/uploads/2020/03/14.png 1384w, https://gbot.dev/wp-content/uploads/2020/03/14-300x209.png 300w, https://gbot.dev/wp-content/uploads/2020/03/14-1024x715.png 1024w, https://gbot.dev/wp-content/uploads/2020/03/14-768x536.png 768w" sizes="(max-width: 1384px) 100vw, 1384px" /></p>
+<p>Now that we defined our tables, it is time to create relationships for GraphQL API. Head to the <strong>Data </strong>tab. Hasura tells you about the Untracked foreign-key relations. Hit <strong>Track All</strong> to expose these relations over GraphQL API.</p>
+<p><img class="alignnone size-full wp-image-83189" src="https://gbot.dev/wp-content/uploads/2020/03/15.png" alt="" width="1338" height="670" srcset="https://gbot.dev/wp-content/uploads/2020/03/15.png 1338w, https://gbot.dev/wp-content/uploads/2020/03/15-300x150.png 300w, https://gbot.dev/wp-content/uploads/2020/03/15-1024x513.png 1024w, https://gbot.dev/wp-content/uploads/2020/03/15-768x385.png 768w" sizes="(max-width: 1338px) 100vw, 1338px" /></p>
+<p>To sum things up, we defined the tables, gave permissions and tracked relationships. Hasura already prepared our API for us at this point. You can head to the <strong>GRAPHIQL </strong>tab and explore the API. There is one last thing to do before we move on. We need a way to query the questions that hasn’t been answered by the user. To do that, we can create a PostgreSQL function with an argument. Hasura will again magically track this function and expose it over GraphQL API. Head to <strong>Data</strong> &gt; <strong>SQL. </strong>In here, you can write raw SQL. It can be for creating triggers, views or a function in our case. Write the following code and don’t forget to check <strong>Track this </strong>box. This box will tell Hasura to track this function and expose it over GraphQL API.</p>
+<pre><code>CREATE
+OR REPLACE FUNCTION public.unanswered_questions(userid text)
+RETURNS SETOF questions LANGUAGE sql STABLE AS
+$function$
+SELECT *
+FROM questions
+WHERE id NOT IN (SELECT question_id FROM user_answers WHERE user_id = userid)
+$function$
+</code></pre>
+<p>After you click Run, the function will take its place below the tables on the sidebar</p>
+<p><img class="alignnone size-full wp-image-83190" src="https://gbot.dev/wp-content/uploads/2020/03/16.png" alt="" width="416" height="610" srcset="https://gbot.dev/wp-content/uploads/2020/03/16.png 416w, https://gbot.dev/wp-content/uploads/2020/03/16-205x300.png 205w" sizes="(max-width: 416px) 100vw, 416px" /></p>
+<p>Now that we have deployed Hasura and modeled the data &amp; relationships, we have can move on to the next step. In <strong>Part 2</strong> we are going to prepare Auth and Business Logic by integrating Firebase services. <strong>Part 3</strong> will cover how to to make the Flutter frontend.</p>
+]]></content:encoded>
+										</item>
+		<item>
+		<title>Adding Splash Screen Animation to Default Flutter App</title>
+		<link>https://gbot.dev/2020/03/24/adding-splash-screen-animation-to-default-flutter-app/</link>
+				<pubDate>Tue, 24 Mar 2020 12:50:47 +0000</pubDate>
+		<dc:creator><![CDATA[Fercan Şen]]></dc:creator>
+				<category><![CDATA[Uncategorized]]></category>
+
+		<guid isPermaLink="false">https://gbot.dev/?p=83287</guid>
+				<description><![CDATA[Introduction In this blog post, we are going to make a splash screen animation using Rive (formerly known as Flare). [&#8230;]]]></description>
+								<content:encoded><![CDATA[<h2>Introduction</h2>
+<p>In this blog post, we are going to make a splash screen animation using Rive (formerly known as Flare). One of the benefits of using Rive is that it reduces boilerplate code when creating animations. First, we are going to design our animation, then we are going to implement it to the default flutter project. We will cover this in two parts. One being design of the animation and the other is implementation.</p>
+<h2>Part 1: Design and Animate</h2>
+<p>Go to rive.app, create your account. Then create a new flare project. This what it will look like:</p>
+<p><img class="alignnone wp-image-83307 size-full" src="https://gbot.dev/wp-content/uploads/2020/03/Default-Flare-1.png" alt="" width="1918" height="903" srcset="https://gbot.dev/wp-content/uploads/2020/03/Default-Flare-1.png 1918w, https://gbot.dev/wp-content/uploads/2020/03/Default-Flare-1-300x141.png 300w, https://gbot.dev/wp-content/uploads/2020/03/Default-Flare-1-1024x482.png 1024w, https://gbot.dev/wp-content/uploads/2020/03/Default-Flare-1-768x362.png 768w, https://gbot.dev/wp-content/uploads/2020/03/Default-Flare-1-1536x723.png 1536w" sizes="(max-width: 1918px) 100vw, 1918px" /></p>
+<p>After you drag and drop your assets, position your design as you desire. Then proceed to the animation tab. We can animate almost anything on the shape.</p>
+<p><img class="alignnone wp-image-83308 size-full" src="https://gbot.dev/wp-content/uploads/2020/03/design.png" alt="" width="1920" height="900" srcset="https://gbot.dev/wp-content/uploads/2020/03/design.png 1920w, https://gbot.dev/wp-content/uploads/2020/03/design-300x141.png 300w, https://gbot.dev/wp-content/uploads/2020/03/design-1024x480.png 1024w, https://gbot.dev/wp-content/uploads/2020/03/design-768x360.png 768w, https://gbot.dev/wp-content/uploads/2020/03/design-1536x720.png 1536w" sizes="(max-width: 1920px) 100vw, 1920px" /></p>
+<h3>Some useful hotkeys when animating:</h3>
+<ul>
+<li><strong>T</strong> for translate, move shapes around.</li>
+<li><strong>S</strong> for scaling the shapes.</li>
+<li><strong>R</strong> for rotating the shapes.</li>
+<li><strong>ctrl+z</strong> to undo</li>
+</ul>
+<p>When you are done with animating export your .flr file in binary format.</p>
+<p><img class="aligncenter wp-image-83317 size-full" src="https://gbot.dev/wp-content/uploads/2020/03/export-1.png" alt="" width="435" height="422" srcset="https://gbot.dev/wp-content/uploads/2020/03/export-1.png 435w, https://gbot.dev/wp-content/uploads/2020/03/export-1-300x291.png 300w" sizes="(max-width: 435px) 100vw, 435px" /></p>
+<h2>Part 2: Flutter Integration</h2>
+<p>Rive provides a package that makes it really simple to use our animations into an iOS or Android app with Flutter. First, create a default Flutter project. You can do that following the steps below. We are using VS Code as IDE.</p>
+<p>To create a new Flutter project from the Flutter starter app template:</p>
+<ol>
+<li>Open the Command Palette (<code class="highlighter-rouge">Ctrl</code>+<code class="highlighter-rouge">Shift</code>+<code class="highlighter-rouge">P</code> (<code class="highlighter-rouge">Cmd</code>+<code class="highlighter-rouge">Shift</code>+<code class="highlighter-rouge">P</code> on macOS)).</li>
+<li>Select the <strong>Flutter: New Project</strong> command and press <code class="highlighter-rouge">Enter</code>.</li>
+<li>Enter your desired <strong>Project name</strong>.</li>
+<li>Select a <strong>Project location</strong>.</li>
+</ol>
+<p id="opening-a-project-from-existing-source-code">Now your default project should be ready.</p>
+<p style="text-align: center;">Add flare_splash_screen to the pubspec.yaml, under dependencies.</p>
+<p><img class="aligncenter wp-image-83311 size-full" src="https://gbot.dev/wp-content/uploads/2020/03/dependenies.png" alt="" width="313" height="113" srcset="https://gbot.dev/wp-content/uploads/2020/03/dependenies.png 313w, https://gbot.dev/wp-content/uploads/2020/03/dependenies-300x108.png 300w" sizes="(max-width: 313px) 100vw, 313px" /></p>
+<p style="text-align: center;">Create an assets folder within your flutter project and add the .flr file you exported to assets.</p>
+<p><img class="aligncenter wp-image-83313 size-full" src="https://gbot.dev/wp-content/uploads/2020/03/assets.png" alt="" width="337" height="487" srcset="https://gbot.dev/wp-content/uploads/2020/03/assets.png 337w, https://gbot.dev/wp-content/uploads/2020/03/assets-208x300.png 208w" sizes="(max-width: 337px) 100vw, 337px" /></p>
+<p style="text-align: center;">Now go and activate your .flr file in pubspec.yaml. Just type the path of the file under assets.</p>
+<p style="text-align: center;"><img class="alignnone wp-image-83312 size-full" src="https://gbot.dev/wp-content/uploads/2020/03/assets-dependencies.png" alt="" width="746" height="137" srcset="https://gbot.dev/wp-content/uploads/2020/03/assets-dependencies.png 746w, https://gbot.dev/wp-content/uploads/2020/03/assets-dependencies-300x55.png 300w" sizes="(max-width: 746px) 100vw, 746px" /></p>
+<p>Saving something in pubspec.yaml file automatically runs &#8220;flutter pub get&#8221; in VSCode. If it does not <span style="font-weight: 400;">you can type </span><span style="font-weight: 400;">flutter pub get</span><span style="font-weight: 400;"> in the terminal.</span></p>
+<p>After adding dependencies and assets we need to import the package in the main.dart like so.</p>
+<p><img class="wp-image-83320 size-full aligncenter" src="https://gbot.dev/wp-content/uploads/2020/03/import.png" alt="" width="666" height="62" srcset="https://gbot.dev/wp-content/uploads/2020/03/import.png 666w, https://gbot.dev/wp-content/uploads/2020/03/import-300x28.png 300w" sizes="(max-width: 666px) 100vw, 666px" /></p>
+<p>Then we go to our main section.</p>
+<p><img class="wp-image-83321 size-full aligncenter" src="https://gbot.dev/wp-content/uploads/2020/03/main.png" alt="" width="747" height="486" srcset="https://gbot.dev/wp-content/uploads/2020/03/main.png 747w, https://gbot.dev/wp-content/uploads/2020/03/main-300x195.png 300w" sizes="(max-width: 747px) 100vw, 747px" /></p>
+<p>In &#8220;home&#8221; we give SplashScreen.navigate widget.</p>
+<ul>
+<li>Name  -&gt; We type the destination of your .flr file.</li>
+<li>Next    -&gt; Give the next widget to be displayed. In this case, we navigate to the homepage.</li>
+<li>Until    -&gt; Duration of the animation on the screen.</li>
+<li>startAnimation  -&gt; Name of the animation. It is &#8220;Untitled&#8221; by default. You can change this on rive.app.</li>
+<li>backgroundColor -&gt; Background color of the splash screen.</li>
+<li>fit -&gt; This makes the animation fit the whole screen.</li>
+</ul>
+<p>GitHub repo of the project: <a href="https://github.com/FercanSen/gbot-animation">https://github.com/FercanSen/gbot-animation</a></p>
+]]></content:encoded>
+										</item>
+		<item>
+		<title>New Blogs Are Coming!</title>
+		<link>https://gbot.dev/2020/02/28/new-blogs-are-coming/</link>
+				<pubDate>Fri, 28 Feb 2020 13:19:39 +0000</pubDate>
+		<dc:creator><![CDATA[gbotweb]]></dc:creator>
+				<category><![CDATA[Uncategorized]]></category>
+
+		<guid isPermaLink="false">http://localhost/wordpress/?p=83151</guid>
+				<description><![CDATA[Our site is new, soon we will post blogs.]]></description>
+								<content:encoded><![CDATA[<p>Our site is new, soon we will post blogs.</p>
+]]></content:encoded>
+										</item>
+		<item>
+		<title>Calm over the horizon</title>
+		<link>https://gbot.dev/2017/03/25/calm-over-the-horizon/</link>
+				<pubDate>Sat, 25 Mar 2017 11:45:51 +0000</pubDate>
+		<dc:creator><![CDATA[gbotweb]]></dc:creator>
+				<category><![CDATA[Travel]]></category>
+		<category><![CDATA[Music]]></category>
+		<category><![CDATA[Style]]></category>
+
+		<guid isPermaLink="false">https://undsgn.com/uncode/?p=20528</guid>
+				<description><![CDATA[Many years ago, I worked for my parents who own a video production company. Because it is a family business, you inevitably end up wearing many hats and being the czar of many different jobs. I mainly managed projects and worked as a video editor. On production, there were times that I was called on to work as an audio tech and was made to wear headphones on long production days. In those days, having a really good set of headphones that picked up every nuance of sound was essential to making sure the client got what they needed.]]></description>
+								<content:encoded><![CDATA[<p>Many years ago, I worked for my parents who own a video production company. Because it is a family business, you inevitably end up wearing many hats and being the czar of many different jobs. I mainly managed projects and worked as a video editor. On production, there were times that I was called on to work as an audio tech and was made to wear headphones on long production days. In those days, having a really good set of headphones that picked up every nuance of sound was essential to making sure the client got what they needed.</p>
+<h4>First impressions.</h4>
+<p>Naturally, my first impression of these headphones is based off of the look of them. They have a classic over-the-ear style that is highlighted by <strong>a blue LED light</strong> that indicates the power for the noise canceling. The padding on the ear pieces seems adequate for extended usage periods.</p>
+<p>They are wired headphones, but the 3.5mm stereo mini-plug cable is detachable. Something else I noticed right of the bat was the very nice carrying case that comes with them. It has a hard plastic exterior with a soft cloth interior that helps to protect the surface of the headphones from scratches. I never truly appreciated cases for headphones until I started carrying them from place-to-place. Now I can’t imagine not having a case.</p>
+<h4>A perfect fit.</h4>
+<p>Once I gave the headphones a thorough once-over exam, I tried them on. As I mentioned, they have a classic <em>over-the-ear style</em> and just looking at them, the padding on the ear pieces seem adequate and the peak of the headband seemed to be a bit lacking, but you don’t really know comfort unless you try on the product. So, I slipped the headphones on and found them to be exquisitely comfortable.</p>
+<h4>Quality.</h4>
+<p>Now that I had the headphones on my head, I was finally ready to plug and play some music. I plugged the provided cable into the jack on the headphones and then the one on my iPhone 6. Then I called up Pandora. I tend to have a very eclectic music purview and have many stations set up for different moods. From <strong>John Williams</strong> to <strong>Fallout Boy</strong>, the sound quality of these headphones was remarkable. There is an amazing depth of sound and incredible highs and lows that make listening to music a truly breathtaking experience.</p>
+<blockquote><p>It’s safe to say that because of my <strong>unique professional experiences</strong>, I’ve tested out a lot of headphones.</p></blockquote>
+<p>In order to test how voices sounded, and the overall art of sound mixing, I pulled up Netflix on my iPad Air 2 and watched a few minutes of a movie to hear all the nuances of the film. None of them were lost. In fact, I ended up hearing sounds that I hadn’t heard before. Echoes…birds chirping…wind blowing through trees…breathing of the characters…it was very impressive what the headphones ended up bringing out for me.</p>
+<p><em>I would highly recommend these to any sound mixing specialist.</em></p>
+]]></content:encoded>
+										</item>
+		<item>
+		<title>Inspired by clouds</title>
+		<link>https://gbot.dev/2017/03/22/inspired-by-clouds/</link>
+				<pubDate>Wed, 22 Mar 2017 11:40:29 +0000</pubDate>
+		<dc:creator><![CDATA[gbotweb]]></dc:creator>
+				<category><![CDATA[Arts]]></category>
+		<category><![CDATA[Business]]></category>
+		<category><![CDATA[Sport]]></category>
+		<category><![CDATA[Music]]></category>
+		<category><![CDATA[Style]]></category>
+
+		<guid isPermaLink="false">https://undsgn.com/uncode/?p=20518</guid>
+				<description><![CDATA[Last year I wrote about why booking too far in advance can be dangerous for your business, and this concept of margin so eloquently captures what I had recognized had been my problem: I was so booked up with clients that I wasn’t leaving any margin for error, growth, planning, or reflection.]]></description>
+								<content:encoded><![CDATA[<div data-parent="true" class="vc_row limit-width row-container"><div class="row quad-top-padding quad-bottom-padding single-h-padding row-parent"><div class="wpb_row row-inner"><div class="wpb_column pos-top pos-center align_left column_parent col-lg-12 single-internal-gutter"><div class="uncol style-light font-134980"  ><div class="uncoltable"><div class="uncell"><div class="uncont no-block-padding col-custom-width" style="max-width:804px;"><div class="vc_custom_heading_wrap "><div class="heading-text el-text" ><h2 class="font-202503 h1" ><span>Take your time.</span></h2></div><div class="clear"></div></div><div class="uncode_text_column text-lead" ><p>I’ve got a Fujifilm X100s. It runs about $1300. It’s easily the best camera I’ve ever owned. I take care of it as best as I can, but I don’t let taking care of it impact the photography. Let me elaborate on that a bit better. You’ll get better at each section of what we talked about slowly. And while you do, you’ll be amazed at how much easier it all is and how the habit forms. The best way to get better at photography is start by taking your camera everywhere. If you leave your house, your camera leaves with you. The only exception is if you’re planning for a weekend bender — then probably leave it at home. Other than that, always have it slung over your shoulder. It would probably help to get an extra battery to carry in your pocket. I’ve got three batteries. One in my camera, one in my pocket, one in the charger.</p>
+<p>When it dies, swap them all.</p>
+<p>For me, the most important part of improving at photography has been sharing it. Sign up for an Exposure account, or post regularly to Tumblr, or both. Tell people you’re trying to get better at photography. Talk about it. When you talk about it, other people get excited about it. They’ll come on photo walks with you. They’ll pose for portraits. They’ll buy your prints, zines, whatever.</p>
+</div></div></div></div></div></div><script id="script-120548" data-row="script-120548" type="text/javascript" class="vc_controls">UNCODE.initRow(document.getElementById("script-120548"));</script></div></div></div><div data-parent="true" class="vc_row style-color-lxmt-bg row-container"><div class="row unequal col-no-gutter no-top-padding no-bottom-padding no-h-padding full-width row-parent" data-height-ratio="50"><div class="wpb_row row-inner"><div class="wpb_column pos-middle pos-center align_left column_parent col-lg-6 single-internal-gutter"><div class="uncol style-light"  ><div class="uncoltable"><div class="uncell quad-block-padding"><div class="uncont" style="max-width:70%;"><div class="vc_custom_heading_wrap "><div class="heading-text el-text" ><h2 class="font-202503 h1 fontheight-357766" ><span>Clouds come floating into my life, no longer to carry rain or usher storm, but to add color to my sunset sky.</span></h2><div class="text-lead text-top-reduced"><p>— Rabindranath Tagore</p>
+</div></div><div class="clear"></div></div></div></div></div></div></div><div class="wpb_column pos-top pos-center align_left column_parent col-lg-6 single-internal-gutter"><div class="uncol style-light"  ><div class="uncoltable"><div class="uncell no-block-padding style-color-wayh-bg   with-parallax"><div class="column-background background-element">
+											<div class="background-wrapper">
+												<div class="background-inner" style="background-image: url(https://gbot.dev/wp-content/uploads/2019/10/image-placeholder-6-min.jpg);background-repeat: no-repeat;background-position: center top;background-size: cover;"></div>
+												
+											</div>
+										</div><div class="uncont"></div></div></div></div></div><script id="script-163302" data-row="script-163302" type="text/javascript" class="vc_controls">UNCODE.initRow(document.getElementById("script-163302"));</script></div></div></div><div data-parent="true" class="vc_row limit-width row-container"><div class="row quad-top-padding quad-bottom-padding single-h-padding row-parent"><div class="wpb_row row-inner"><div class="wpb_column pos-top pos-center align_left column_parent col-lg-12 single-internal-gutter"><div class="uncol style-light font-134980"  ><div class="uncoltable"><div class="uncell"><div class="uncont no-block-padding col-custom-width" style="max-width:804px;"><div class="vc_custom_heading_wrap "><div class="heading-text el-text" ><h2 class="font-202503 h1" ><span>Breathe the world.</span></h2></div><div class="clear"></div></div><div class="uncode_text_column text-lead" ><p>I’ve got a Fujifilm X100s. It runs about $1300. It’s easily the best camera I’ve ever owned. I take care of it as best as I can, but I don’t let taking care of it impact the photography. Let me elaborate on that a bit better. You’ll get better at each section of what we talked about slowly. And while you do, you’ll be amazed at how much easier it all is and how the habit forms. The best way to get better at photography is start by taking your camera everywhere. If you leave your house, your camera leaves with you. The only exception is if you’re planning for a weekend bender — then probably leave it at home. Other than that, always have it slung over your shoulder. It would probably help to get an extra battery to carry in your pocket. I’ve got three batteries. One in my camera, one in my pocket, one in the charger. When it dies, swap them all.</p>
+<p>For me, the most important part of improving at photography has been sharing it. Sign up for an Exposure account, or post regularly to Tumblr, or both. Tell people you’re trying to get better at photography. Talk about it. When you talk about it, other people get excited about it. They’ll come on photo walks with you. They’ll pose for portraits. They’ll buy your prints, zines, whatever.</p>
+</div></div></div></div></div></div><script id="script-163100" data-row="script-163100" type="text/javascript" class="vc_controls">UNCODE.initRow(document.getElementById("script-163100"));</script></div></div></div><div data-parent="true" class="vc_row style-color-lxmt-bg row-container"><div class="row unequal col-no-gutter no-top-padding no-bottom-padding no-h-padding full-width row-parent" data-height-ratio="50"><div class="wpb_row row-inner"><div class="wpb_column pos-top pos-center align_left column_parent col-lg-6 single-internal-gutter"><div class="uncol style-light"  ><div class="uncoltable"><div class="uncell no-block-padding style-color-wayh-bg   with-parallax"><div class="column-background background-element">
+											<div class="background-wrapper">
+												<div class="background-inner" style="background-image: url(https://gbot.dev/wp-content/uploads/2019/10/image-placeholder-28-min.jpg);background-repeat: no-repeat;background-position: center top;background-size: cover;"></div>
+												
+											</div>
+										</div><div class="uncont"></div></div></div></div></div><div class="wpb_column pos-middle pos-center align_left column_parent col-lg-6 single-internal-gutter"><div class="uncol style-light"  ><div class="uncoltable"><div class="uncell quad-block-padding"><div class="uncont" style="max-width:70%;"><div class="vc_custom_heading_wrap "><div class="heading-text el-text" ><h2 class="font-202503 h1 fontheight-357766" ><span>Heavy hearts, like heavy clouds in the sky, are best relieved by the letting of a little water.</span></h2><div class="text-lead text-top-reduced"><p>— Christopher Morley</p>
+</div></div><div class="clear"></div></div></div></div></div></div></div><script id="script-857468" data-row="script-857468" type="text/javascript" class="vc_controls">UNCODE.initRow(document.getElementById("script-857468"));</script></div></div></div><div data-parent="true" class="vc_row limit-width row-container"><div class="row quad-top-padding quad-bottom-padding single-h-padding row-parent"><div class="wpb_row row-inner"><div class="wpb_column pos-top pos-center align_left column_parent col-lg-12 single-internal-gutter"><div class="uncol style-light font-134980"  ><div class="uncoltable"><div class="uncell"><div class="uncont no-block-padding col-custom-width" style="max-width:804px;"><div class="vc_custom_heading_wrap "><div class="heading-text el-text" ><h2 class="font-202503 h1" ><span>Enjoy the morning.</span></h2></div><div class="clear"></div></div><div class="uncode_text_column text-lead" ><p>The best way to get better at photography is start by taking your camera everywhere. If you leave your house, your camera leaves with you. The only exception is if you’re planning for a weekend bender — then probably leave it at home. Other than that, always have it slung over your shoulder. It would probably help to get an extra battery to carry in your pocket. I’ve got three batteries. One in my camera, one in my pocket, one in the charger. When it dies, swap them all.</p>
+<p>For me, the most important part of improving at photography has been sharing it. Sign up for an Exposure account, or post regularly to Tumblr, or both. Tell people you’re trying to get better at photography. Talk about it. When you talk about it, other people get excited about it. They’ll come on photo walks with you. They’ll pose for portraits. They’ll buy your prints, zines, whatever. I’ve got a Fujifilm X100s. It runs about $1300.</p>
+<p>It’s easily the best camera I’ve ever owned. I take care of it as best as I can, but I don’t let taking care of it impact the photography. Let me elaborate on that a bit better. You’ll get better at each section of what we talked about slowly. And while you do, you’ll be amazed at how much easier it all is and how the habit forms.</p>
+</div></div></div></div></div></div><script id="script-168962" data-row="script-168962" type="text/javascript" class="vc_controls">UNCODE.initRow(document.getElementById("script-168962"));</script></div></div></div><div data-parent="true" class="vc_row style-color-wayh-bg row-container with-parallax"><div class="row-background background-element">
+											<div class="background-wrapper">
+												<div class="background-inner" style="background-image: url(https://gbot.dev/wp-content/uploads/2019/10/image-placeholder-20-min.jpg);background-repeat: no-repeat;background-position: center center;background-size: cover;"></div>
+												<div class="block-bg-overlay style-color-wayh-bg" style="opacity: 0.25;"></div>
+											</div>
+										</div><div class="row no-top-padding no-bottom-padding single-h-padding limit-width row-parent" data-height-ratio="65"><div class="wpb_row row-inner"><div class="wpb_column pos-middle pos-center align_center column_parent col-lg-12 single-internal-gutter"><div class="uncol style-dark"  ><div class="uncoltable"><div class="uncell single-block-padding"><div class="uncont"><div class="vc_custom_heading_wrap "><div class="heading-text el-text" ><h1 class="font-202503 fontsize-155944 fontspace-781688" ><span>There are no rules of architecture for a castle in the clouds and this is real.</span></h1><div class="text-lead text-top-reduced"><p>— Gilbert K. Chesterton</p>
+</div></div><div class="clear"></div></div></div></div></div></div></div><script id="script-204312" data-row="script-204312" type="text/javascript" class="vc_controls">UNCODE.initRow(document.getElementById("script-204312"));</script></div></div></div><div data-parent="true" class="vc_row limit-width row-container"><div class="row quad-top-padding double-bottom-padding single-h-padding row-parent"><div class="wpb_row row-inner"><div class="wpb_column pos-top pos-center align_left column_parent col-lg-12 single-internal-gutter"><div class="uncol style-light font-134980"  ><div class="uncoltable"><div class="uncell"><div class="uncont no-block-padding col-custom-width" style="max-width:804px;"><div class="vc_custom_heading_wrap "><div class="heading-text el-text" ><h2 class="font-202503 h1" ><span>Free your mind.</span></h2></div><div class="clear"></div></div><div class="uncode_text_column text-lead" ><p>The best way to get better at photography is start by taking your camera everywhere. If you leave your house, your camera leaves with you. The only exception is if you’re planning for a weekend bender — then probably leave it at home. Other than that, always have it slung over your shoulder. It would probably help to get an extra battery to carry in your pocket. I’ve got three batteries. One in my camera, one in my pocket, one in the charger. When it dies, swap them all.</p>
+<p>I’ve got a Fujifilm X100s. It runs about $1300. It’s easily the best camera I’ve ever owned. I take care of it as best as I can, but I don’t let taking care of it impact the photography. Let me elaborate on that a bit better. You’ll get better at each section of what we talked about slowly. And while you do, you’ll be amazed at how much easier it all is and how the habit forms.</p>
+<p>For me, the most important part of improving at photography has been sharing it. Sign up for an Exposure account, or post regularly to Tumblr, or both. Tell people you’re trying to get better at photography. Talk about it. When you talk about it, other people get excited about it. They’ll come on photo walks with you. They’ll pose for portraits. They’ll buy your prints, zines, whatever.</p>
+<p>Photography is better shared.</p>
+</div></div></div></div></div></div><script id="script-213670" data-row="script-213670" type="text/javascript" class="vc_controls">UNCODE.initRow(document.getElementById("script-213670"));</script></div></div></div>
+]]></content:encoded>
+										</item>
+		<item>
+		<title>Make it clean and simple</title>
+		<link>https://gbot.dev/2017/03/20/make-it-clean-and-simple/</link>
+				<pubDate>Mon, 20 Mar 2017 11:39:07 +0000</pubDate>
+		<dc:creator><![CDATA[gbotweb]]></dc:creator>
+				<category><![CDATA[Business]]></category>
+		<category><![CDATA[Sport]]></category>
+		<category><![CDATA[Music]]></category>
+		<category><![CDATA[Style]]></category>
+
+		<guid isPermaLink="false">https://undsgn.com/uncode/?p=20520</guid>
+				<description><![CDATA[Just the other day I happened to wake up early. That is unusual for an engineering student. After a long time I could witness the sunrise. I could feel the sun rays falling on my body. Usual morning is followed by hustle to make it to college on time. This morning was just another morning yet seemed different.]]></description>
+								<content:encoded><![CDATA[<h4>Create your header preset in just few clicks.</h4>
+<p>Just the other day I happened to wake up early. That is unusual for an engineering student. After a long time I could witness the sunrise. I could feel the sun rays falling on my body. Usual morning is followed by hustle to make it to college on time. This morning was just another morning yet seemed different.</p>
+<p>Witnessing calm and quiet atmosphere, clear and fresh air seemed like a miracle to me. I wanted this time to last longer since I was not sure if I would be able to witness it again, knowing my habit of succumbing to schedule. There was this unusual serenity that comforted my mind. It dawned on me, how distant I had been from nature. Standing near the compound’s gate, feeling the moistness that the air carried, <em>I thought about my life so far</em>.</p>
+<blockquote><p>This is what has happened to us. We want the things we have been doing forcefully to fail. And then maybe people around us would let us try something else or our dreams. <strong>We are accustomed to live by everyone </strong>else’s <strong class="markup--strong markup--pullquote-strong">definition of success. </strong>We punish people for the things they are passionate about, just because we were unable to do the same at some point in our life.</p></blockquote>
+<p>I was good at academics, so decisions of my life had been pretty simple and straight. Being pretty confident I would make it to the best junior college of my town in the first round itself, never made me consider any other option. I loved psychology since childhood, but engineering was the safest option. Being born in a middle class family, thinking of risking your career to make it to medical field was not sane. I grew up hearing <em>‘Only doctor</em>’s children can afford that field’ and finally ended up believing it. No one around me believed in taking risks. Everyone worshiped security. I grew up doing the same.</p>
+<h4>Control fonts, background, size, parallax and overlay&#8230;</h4>
+<p>‘Being in the top will only grant you a good life’ has been the mantra of my life. But at times, I wish I was an average student. I wish decisions would have not been so straightforward. Maybe I would have played cricket- the only thing I feel passionate about. Or maybe I would have studied literature (literature drives me crazy). Isn’t that disappointing- me wishing to be bad at academics. It’s like at times I hate myself for the stuff I am good at.</p>
+<p>I feel like these concrete buildings have sucked our desires and our dreams. We are so used to comfort that compromise seems like a taboo. We have lost faith in ourselves. If we can make through it right now, we can do the same in the days to come. You only need a desire to survive and nothing more- not money or cars or designer clothes.</p>
+<p><em>Staying locked up in four walls have restricted our thinking. I feel like our limited thinking echoes through this wall. We are so used to schedules and predictable life that we have successfully suppressed our creative side.</em></p>
+<p>When you step out of these four walls on a peaceful morning, you realize how much nature has to offer to you. Its boundless. Your thoughts, worries, deadlines won’t resonate here. Everything will flow away along with the wind. And you will realize every answer you had been looking for, was always known to you.</p>
+<p>It would mean a lot to me if you recommend this article and help me improve. <strong>I would love to know your thoughts!</strong></p>
+]]></content:encoded>
+										</item>
+		<item>
+		<title>When you are alone</title>
+		<link>https://gbot.dev/2017/03/18/when-you-are-alone/</link>
+				<pubDate>Fri, 17 Mar 2017 23:00:11 +0000</pubDate>
+		<dc:creator><![CDATA[gbotweb]]></dc:creator>
+				<category><![CDATA[Lifestyle]]></category>
+		<category><![CDATA[Trip]]></category>
+		<category><![CDATA[Design]]></category>
+		<category><![CDATA[Enjoy]]></category>
+
+		<guid isPermaLink="false">https://undsgn.com/uncode/?p=4193</guid>
+				<description><![CDATA[When you are alone for days or weeks at a time, you eventually become drawn to people. Talking to randos is the norm. After a long time I could witness the sunrise. I could feel the sun rays falling on my body. ]]></description>
+								<content:encoded><![CDATA[<h4>You will remember the people more than the place.</h4>
+<p>Talking to randos is the norm. I’ll never forget the conversation with the aquarium fisherman, forest ranger, and women at the Thai market. It’s refreshing to compare notes on life with people from vastly different backgrounds. When you are alone for days or weeks at a time, you eventually become drawn to people.</p>
+<p>When you meet fellow travelers, you’ll find they are also filled with a similar sense of adventure and curiosity about the world. Five days of friendship on the road is like five months of friendship at home. It’s the experiences that bond you together, not the place. A rule I followed that worked well: be the first to initiate conversation. I met some incredible people by simply being the first to talk.</p>
+<blockquote><p>Make a radical change in your lifestyle and <strong>begin to boldly do things</strong> which you may previously never have thought of doing, or been too hesitant to attempt. But once you become accustomed to such a life you will see its full meaning and its incredible beauty.</p></blockquote>
+<h4>Travel can be affordable.</h4>
+<p>Long term travel is different than a luxury vacation. The point is to see the world, not stay in a 5-star hotel. During the trip, I stayed on a strict budget. The goal was to spend no more than $33 per day on accommodations. After a year, I was able to spend only $26.15 per day by booking through <a href="http://www.google.com" target="_blank" rel="noopener noreferrer">HostelWorld</a> and <a href="http://www.google.com" target="_blank" rel="noopener noreferrer">Airbnb</a>. When I wanted to meet people, I’d stay in a shared room at a hostel. When I wanted to be alone, I’d book a private room with Airbnb.</p>
+<p>Take the cost of your rent or mortgage + food per month and divide it by 30. This is how much it costs per day to live at home. You will find that it’s possible to travel the world for roughly the same amount. Or, if you live in an expensive city like San Francisco, far less.</p>
+<h4>English is a universal language.</h4>
+<p>I was surprised how many people spoke English (apparently 1.8 billion people worldwide). Places where English was less prevalent, I made an effort to learn a handful of words and phrases in the local language. Even though it’s passable, I do desire to learn another language fluently. You can only take the conversation so far when all you can say is: <em>“¿Esto contiene gluten?”</em></p>
+<p>It’s possible to communicate a lot without saying a word. For instance, I left my phone at a restaurant in Chile. I pointed at the table where I was sitting, put my hand to my ear like a phone, then shrugged — 2 minutes later, my phone had been retrieved.</p>
+<h4>Trust your intuition.</h4>
+<p>I learned to trust that tiny voice in my head a bit more. When you are alone in a foreign country and your phone is dead, you are forced to trust your intuition. Is this neighborhood safe to walk around? Is this person someone I should interact with? Am I heading the right direction? Intuition is like a muscle. The more you use it, the stronger it becomes. It’s feels like a sixth sense when you’re able to read between the lines of a situation.</p>
+<blockquote><p>The world is endless. <strong>The world’s a tiny neighborhood.</strong> My fav people are the ones who can hold two impossible ideas in their heads.</p></blockquote>
+]]></content:encoded>
+										</item>
+		<item>
+		<title>Real time design tools</title>
+		<link>https://gbot.dev/2017/03/07/real-time-design-tools/</link>
+				<pubDate>Mon, 06 Mar 2017 23:00:02 +0000</pubDate>
+		<dc:creator><![CDATA[gbotweb]]></dc:creator>
+				<category><![CDATA[Travel]]></category>
+		<category><![CDATA[Tech]]></category>
+		<category><![CDATA[Style]]></category>
+
+		<guid isPermaLink="false">https://undsgn.com/uncode/?p=4225</guid>
+				<description><![CDATA[Just the other day I happened to wake up early. That is unusual for an engineering student. After a long time I could witness the sunrise. I could feel the sun rays falling on my body. Usual morning is followed by hustle to make it to college on time. This morning was just another morning yet seemed different.]]></description>
+								<content:encoded><![CDATA[<p>Just the other day I happened to wake up early. That is unusual for an engineering student. After a long time I could witness the sunrise. I could feel the sun rays falling on my body. Usual morning is followed by hustle to make it to college on time. This morning was just another morning yet seemed different.</p>
+<p>Witnessing calm and quiet atmosphere, clear and fresh air seemed like a miracle to me. I wanted this time to last longer since I was not sure if I would be able to witness it again, knowing my habit of succumbing to schedule. There was this unusual serenity that comforted my mind. It dawned on me, how distant I had been from nature. Standing near the compound’s gate, feeling the moistness that the air carried, <em>I thought about my life so far</em>.</p>
+<p>I was good at academics, so decisions of my life had been pretty simple and straight. Being pretty confident I would make it to the best junior college of my town in the first round itself, never made me consider any other option. I loved psychology since childhood, but engineering was the safest option. Being born in a middle class family, thinking of risking your career to make it to medical field was not sane. I grew up hearing <em>‘Only doctor</em>’s children can afford that field’ and finally ended up believing it. No one around me believed in taking risks. Everyone worshiped security. I grew up doing the same.</p>
+<blockquote><p>This is what has happened to us. We want the things we have been doing forcefully to fail. And then maybe people around us would let us try something else or our dreams. <strong>We are accustomed to live by everyone </strong>else’s <strong class="markup--strong markup--pullquote-strong">definition of success. </strong>We punish people for the things they are passionate about, just because we were unable to do the same at some point in our life.</p></blockquote>
+<p>I feel like these concrete buildings have sucked our desires and our dreams. We are so used to comfort that compromise seems like a taboo. We have lost faith in ourselves. If we can make through it right now, we can do the same in the days to come. You only need a desire to survive and nothing more- not money or cars or designer clothes.</p>
+<p><em>Staying locked up in four walls have restricted our thinking. I feel like our limited thinking echoes through this wall. We are so used to schedules and predictable life that we have successfully suppressed our creative side.</em></p>
+<p>When you step out of these four walls on a peaceful morning, you realize how much nature has to offer to you. Its boundless. Your thoughts, worries, deadlines won’t resonate here. Everything will flow away along with the wind. And you will realize every answer you had been looking for, was always known to you.</p>
+<p>It would mean a lot to me if you recommend this article and help me improve. <strong>I would love to know your thoughts!</strong></p>
+]]></content:encoded>
+										</item>
+		<item>
+		<title>Stumbled the concept</title>
+		<link>https://gbot.dev/2017/03/03/stumbled-the-concept/</link>
+				<pubDate>Thu, 02 Mar 2017 23:00:11 +0000</pubDate>
+		<dc:creator><![CDATA[gbotweb]]></dc:creator>
+				<category><![CDATA[Lifestyle]]></category>
+		<category><![CDATA[Arts]]></category>
+		<category><![CDATA[Travel]]></category>
+		<category><![CDATA[Trip]]></category>
+		<category><![CDATA[Life]]></category>
+
+		<guid isPermaLink="false">https://undsgn.com/uncode/?p=4636</guid>
+				<description><![CDATA[Last year I wrote about why booking too far in advance can be dangerous for your business, and this concept of margin so eloquently captures what I had recognized had been my problem: I was so booked up with clients that I wasn’t leaving any margin for error, growth, planning, or reflection.]]></description>
+								<content:encoded><![CDATA[<div data-parent="true" class="vc_row row-container"><div class="row double-top-padding double-bottom-padding single-h-padding limit-width row-parent"><div class="wpb_row row-inner"><div class="wpb_column pos-top pos-center align_left column_parent col-lg-12 single-internal-gutter"><div class="uncol style-light"  ><div class="uncoltable"><div class="uncell"><div class="uncont no-block-padding col-custom-width" style="max-width:804px;"><div class="uncode-single-media  text-left"><div class="single-wrapper" style="max-width: 100%;"><div class="tmb tmb-light  tmb-media-first tmb-media-last tmb-content-overlay tmb-no-bg">
+						<div class="t-inside"><div class="t-entry-visual"><div class="t-entry-visual-tc"><div class="uncode-single-media-wrapper">
+									<img src="https://gbot.dev/wp-content/uploads/2019/10/image-placeholder-29-min.jpg" width="1920" height="1280" alt=""></div>
+				</div>
+			</div></div>
+					</div></div></div><div class="empty-space empty-half" ><span class="empty-space-inner"></span></div>
+<div class="vc_custom_heading_wrap "><div class="heading-text el-text" ><h1 class="font-762333 fontsize-155944 fontspace-111509 font-weight-700" ><span>Stumbled the concept</span></h1></div><div class="clear"></div></div><div class="uncode-info-box  font-762333 font-weight-600 text-uppercase" ><span class="author-wrap"><a href="https://gbot.dev/author/gbotweb/"><span class="uncode-ib-avatar uncode-ib-avatar-size-md"><img alt='gbotweb' src='https://secure.gravatar.com/avatar/4ffa22c9ae267434c6645a2c28986e33?s=40&#038;d=mm&#038;r=g' srcset='https://secure.gravatar.com/avatar/4ffa22c9ae267434c6645a2c28986e33?s=80&#038;d=mm&#038;r=g 2x' class='avatar avatar-40 photo' height='40' width='40' /></span></a><span class="author-info">By <a href="https://gbot.dev/author/gbotweb/">gbotweb</a></span></span><span class="uncode-ib-separator uncode-ib-separator-symbol">&bull;</span><span class="date-info">March 3, 2017</span><span class="uncode-ib-separator uncode-ib-separator-symbol">&bull;</span>7 Minutes</div><div class="uncode_text_column" ></p>
+<p style="text-align: justify;">If you’re not sure how much time you are actually spending on various tasks, use a tool like Rescue Time (their free version is excellent!) which runs in the background and tracks where your time is being spent. It can even send you weekly reports so you know exactly how much time you wasted on Facebook, or spent in your email inbox! You can assign different websites or programs/applications on a scale of very distracting to very productive, so you can see at a glance things like: which days of the week you’re most productive, which times of the day you’re most productive, and the sites on which you’re spending the most distracting time. I stumbled upon the concept of margin while reading a post by <a href="http://www.google.com" target="_blank" rel="noopener noreferrer">Michael Hyatt</a>, which led me to design my ideal week.</p>
+<p style="text-align: justify;">Richard Swenson, M.D. (who wrote the book: Margin: Restoring Emotional, Physical, Financial, and Time Reserves to Overloaded Lives) describes margin like this:</p>
+<p style="text-align: justify;">Last year I wrote about why booking too far in advance can be dangerous for your business, and this concept of margin so eloquently captures what I had recognized had been my problem: I was so booked up with clients that I wasn’t leaving any margin for error, growth, planning, or reflection. I wasn’t really growing my business in a sustainable way; I was just booking one client after the next. At the time this seemed like a good thing: doesn’t growing my business mean getting more clients?</p>
+<p style="text-align: justify;">What if instead of booking up to 100% capacity (which more often than not ends up being closer to 120%), we only booked up to an 80% capacity?</p>
+<p style="text-align: justify;">What if we left more room for growth (personal or professional) and stopped being one with “busy-ness”?<br />
+I spent nearly a year turning down every new project (and even getting rid of old ones) so that I could reduce my workload, build in more margin, and create what is now Digital Strategy School. It takes time to build margin into your schedule.</p>
+<h4 style="text-align: justify;">What could you accomplish with 20% more time?</h4>
+<p style="text-align: justify;">Write a book. Create a program. Update your contracts and proposals (which has been on your to-do list for how long..?) Spend more time with your family. Go above and beyond for a client. Learn something new. Actually follow through on the things that have been nagging at you for a long time.</p>
+<p style="text-align: justify;">When you design your ideal week, you start to see that the time you think you have is often not in alignment with how much time you actually have.</p>
+<p style="text-align: justify;">After designing my ideal week, I had a much clearer idea of how to create a framework for my week that would empower me to feel more focused by theming days of the week, and even parts of the day. SO simple, I know. Some of you have been doing this for ages and you’re already a pro, and some of you who saw my schedule said <em>“woah, that’s so rigid, I need more flexibility!”</em></p>
+<h4 style="text-align: justify;">Structure enables flexibility.</h4>
+<p style="text-align: justify;">If you’re not sure how much time you are actually spending on various tasks, use a tool like Rescue Time (their free version is excellent!) which runs in the background and tracks where your time is being spent. It can even send you weekly reports so you know exactly how much time you wasted on Facebook, or spent in your email inbox! You can assign different websites or programs/applications on a scale of very distracting to very productive, so you can see at a glance things like: which days of the week you’re most productive, which times of the day you’re most productive, and the sites on which you’re spending the most distracting time. Turns out I’m consistently “in the zone” around 3pm in the afternoon; so instead of trying to tackle highly creative work first thing in the morning (when my brain is barely functioning), I handle it in the afternoon, when I know I’m at my peak!</p>
+<p>Creating more margin has been game-changing for my business.<br />
+<strong>What would be possible for yours?</strong></p>
+</div></div></div></div></div></div><script id="script-172305" data-row="script-172305" type="text/javascript" class="vc_controls">UNCODE.initRow(document.getElementById("script-172305"));</script></div></div></div>
+]]></content:encoded>
+										</item>
+		<item>
+		<title>Time is passing by</title>
+		<link>https://gbot.dev/2017/03/02/time-is-passing-by/</link>
+				<pubDate>Wed, 01 Mar 2017 23:00:07 +0000</pubDate>
+		<dc:creator><![CDATA[gbotweb]]></dc:creator>
+				<category><![CDATA[Business]]></category>
+		<category><![CDATA[Travel]]></category>
+		<category><![CDATA[Tech]]></category>
+		<category><![CDATA[Life]]></category>
+		<category><![CDATA[Sport]]></category>
+
+		<guid isPermaLink="false">https://undsgn.com/uncode/?p=4229</guid>
+				<description><![CDATA[Every selector has the potential to have unintended side effects by targeting unwanted elements or clashing with other selectors. More surprisingly, our selectors may even lose out in the global specificity war, ultimately having little or no effect on the page at all. Any time we make a change to a CSS file, we need to carefully consider the global environment in which our styles will sit. No other front end technology requires so much discipline just to keep the code at a minimum level of maintainability.]]></description>
+								<content:encoded><![CDATA[<p>CSS selectors all exist within the same global scope. Anyone who has worked with CSS long enough has had to come to terms with its aggressively global nature — a model clearly designed in the age of documents, now struggling to offer a sane working environment for today’s modern web applications. Every selector has the potential to have unintended side effects by targeting unwanted elements or clashing with other selectors. More surprisingly, our selectors may even lose out in the global specificity war, ultimately having little or no effect on the page at all.</p>
+<p>Any time we make a change to a CSS file, we need to carefully consider the global environment in which our styles will sit. No other front end technology requires so much discipline just to keep the code at a minimum level of maintainability. But it doesn’t have to be this way. It’s time to leave the era of global style sheets behind.</p>
+<p><em>It’s time for local CSS.</em></p>
+<blockquote><p>In other languages, it’s accepted that modifying <strong>the global environment</strong> is something to be done rarely, if ever.</p></blockquote>
+<p>In the JavaScript community, thanks to tools like Browserify, Webpack and JSPM, it’s now expected that our code will consist of small modules, each encapsulating their explicit dependencies, exporting a minimal API.</p>
+<p>Yet, somehow, CSS still seems to be getting a free pass.</p>
+<p>Many of us — myself included, until recently — have been working with CSS so long that we don’t see the lack of local scope as a problem that we can solve without significant help from browser vendors. Even then, we’d still need to wait for the majority of our users to be using a browser with proper Shadow DOM support.</p>
+<p>We’ve worked around the issues of global scope with a series of naming conventions like <strong>OOCSS</strong>, <strong>SMACSS</strong>, <strong>BEM</strong> and <strong>SUIT</strong>, each providing a way for us to avoid naming collisions and emulate sane scoping rules.</p>
+<p>We no longer need to add lengthy prefixes to all of our selectors to simulate scoping. More components could define their own foo and bar identifiers which — unlike the traditional global selector model—wouldn’t produce any naming collisions.</p>
+<pre><strong>import</strong> styles <strong>from</strong> './MyComponent.css';
+<strong>import</strong> React, { Component } <strong>from</strong> 'react';
+<strong>export default class</strong> MyComponent <strong>extends</strong> Component {
+ <strong>render</strong>() {
+    return (
+      &lt;div&gt;
+        &lt;div className={<strong>styles.foo</strong>}&gt;<strong>Foo</strong>&lt;/div&gt;
+        &lt;div className={<strong>styles.bar</strong>}&gt;<strong>Bar</strong>&lt;/div&gt;
+      &lt;/div&gt;
+    );
+  }</pre>
+<p>The benefits of global CSS — style re-use between components via utility classes, etc. — are still achievable with this model. The key difference is that, just like when we work in other technologies, we need to explicitly import the classes that we depend on. Our code can’t make many, if any, assumptions about the global environment.</p>
+<blockquote><p>Writing maintainable CSS is now encouraged, not by <strong>careful adherence to a naming convention</strong>, but by style encapsulation during development.</p></blockquote>
+<p>Once you’ve tried working with local CSS, there’s really no going back. Experiencing true local scope in our style sheets — in a way that works across all browsers— is not something to be easily ignored.</p>
+<p>Introducing local scope has had a significant ripple effect on how we approach our CSS. Naming conventions, patterns of re-use, and the potential extraction of styles into separate packages are all directly affected by this shift, and we’re only at the beginning of this new era of local CSS.</p>
+<pre>process.env.NODE_ENV === 'development' ?<strong>
+    '[name]__[local]___[hash:base64:5]</strong>' :
+    '<strong>[hash:base64:5]'
+</strong>)</pre>
+<p>Understanding the ramifications of this shift is something that we’re still working through. With your valuable input and experimentation, I’m hoping that this is a conversation we can have together as a larger community.</p>
+<p><em>Note: Automatically optimising style re-use between components would be an amazing step forward, but it definitely requires help from people a lot smarter than me. </em></p>
+]]></content:encoded>
+										</item>
+	</channel>
+</rss>
